@@ -114,6 +114,13 @@ public class RiveScreen : MonoBehaviour
                 true
             );
         }
+        else if (m_helper == null && Event.current.type.Equals(EventType.Repaint))
+        {
+            // Submit the render queue manually when using an SRP directly on
+            // the Repaint event (which currently is issued when the GUI is
+            // repainted on top of the scene).
+            m_riveRenderer.Submit();
+        }
     }
 
     private void Awake()
@@ -129,9 +136,12 @@ public class RiveScreen : MonoBehaviour
         Assert.IsNotNull(camera, "TestRive must be attached to a camera.");
 
         bool drawToScreen = Rive.RenderQueue.supportsDrawingToScreen();
-        m_renderQueue = new Rive.RenderQueue(null);
+
+        // Make a RenderQueue that doesn't have a backing texture and does not
+        // clear the target (we'll be drawing on top of it).
+        m_renderQueue = new Rive.RenderQueue(null, false);
         m_riveRenderer = m_renderQueue.Renderer();
-        //if (!drawToScreen)
+        if (!drawToScreen)
         {
             m_helper = new CameraTextureHelper(camera, m_renderQueue);
         }
@@ -153,8 +163,8 @@ public class RiveScreen : MonoBehaviour
 
     private void Update()
     {
-        m_helper?.update();
-        m_riveRenderer.Submit();
+        // m_helper?.update();
+        // m_riveRenderer.Submit();
 
         if (m_artboard == null)
         {
