@@ -123,6 +123,8 @@ public class RiveScreen : MonoBehaviour
         }
     }
 
+    bool drawToScreen = false;
+
     private void Awake()
     {
         if (asset != null)
@@ -135,7 +137,7 @@ public class RiveScreen : MonoBehaviour
         Camera camera = gameObject.GetComponent<Camera>();
         Assert.IsNotNull(camera, "TestRive must be attached to a camera.");
 
-        bool drawToScreen = Rive.RenderQueue.supportsDrawingToScreen();
+        drawToScreen = Rive.RenderQueue.supportsDrawingToScreen();
 
         // Make a RenderQueue that doesn't have a backing texture and does not
         // clear the target (we'll be drawing on top of it).
@@ -163,8 +165,10 @@ public class RiveScreen : MonoBehaviour
 
     private void Update()
     {
-        // m_helper?.update();
-        // m_riveRenderer.Submit();
+        if (!drawToScreen) {
+            m_helper?.update();
+            m_riveRenderer.Submit();
+        }
 
         if (m_artboard == null)
         {
